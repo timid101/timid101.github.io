@@ -1,0 +1,2400 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIxODIwMjE4MzE4NzUzMDI0MTcyMyIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjX2IxN2IyYTdiM2EwM2IwOTBfNGQ5MTNhOGRfaXFyYW11enphbWFuX3BvcnRmb2xpby5odG1sLXVuZGVmaW5lZCJ9LCJleHAiOjE3OTQ5MzIxNDksImlhdCI6MTc5NDkyODU0OSwiYWxnIjoiUlMyNTYifQ.AowgueGqGPVWgUcdklgEyvhIvUR-QoDdURA6E5-W-gcLO04-ovLcKi3L014heHqIINv4Ivz_Pv_OPg0kKMtiho0XDkG2L7wK_xKIpK92ybJGoHCeE_q0HsOn8L60GZTWJ-mqjuigW6e4h5wUUxTs7HeEpyLu9KzAEKji9JmZ0segXTaj-xUqac2d8Y7il_iT8dS57YW0zJBZSg0RcAqDeetPYeK60gnRQ4KFIwBDDu9KBoX6XAtWuilYRRhrnkNlbg_xTtD7x6vkPVHbUm2YF9TmSRwK-Jrw1voNVljmYmyPEffJO7VnNuYZjoY7QDmzaQM-LOcdxpx1u5-w3O3RoQ","c_b17b2a7b3a03b090_4d913a8d_iqramuzzaman_portfolio.html-undefined")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.i=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.extensions="";var l=0,t=null,r=null,q=[],F=new TextEncoder,
+G=new TextDecoder;c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*
+16|0;return(f==="x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;
+(g=t)==null||g.postMessage(a)}};Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function() {
+  const OVERLAY_SELECTOR =
+    'dialog[open], [role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [role="combobox"]';
+
+  function isVisibleOverlay(element) {
+    if (element.closest('[hidden], [aria-hidden="true"], [inert]')) {
+      return false;
+    }
+    if (window.getComputedStyle(element).visibility === 'hidden') {
+      return false;
+    }
+    for (let cur = element; cur; cur = cur.parentElement) {
+      if (window.getComputedStyle(cur).display === 'none') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function hasOpenOverlay() {
+    const candidates = document.querySelectorAll(OVERLAY_SELECTOR);
+    for (let i = 0; i < candidates.length; i++) {
+      if (isVisibleOverlay(candidates[i])) {
+        return true;
+      }
+    }
+    try {
+      if (document.querySelector('[popover]:popover-open')) {
+        return true;
+      }
+    } catch (e) {
+      // Ignore engines that do not support :popover-open.
+    }
+    return false;
+  }
+
+  function isNonEmptySearchInput(target) {
+    return (
+      Boolean(target) &&
+      target.tagName === 'INPUT' &&
+      typeof target.type === 'string' &&
+      target.type.toLowerCase() === 'search' &&
+      typeof target.value === 'string' &&
+      target.value.length > 0
+    );
+  }
+
+  function shouldIgnoreEscape(event) {
+    return (
+      event.key !== 'Escape' ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.isComposing ||
+      event.repeat ||
+      event.keyCode === 229 ||
+      isNonEmptySearchInput(event.target)
+    );
+  }
+
+  let shouldIgnoreCaptureState = false;
+
+  window.addEventListener(
+    'keydown',
+    function(event) {
+      if (event.key === 'Escape') {
+        shouldIgnoreCaptureState =
+          hasOpenOverlay() || isNonEmptySearchInput(event.target);
+      }
+    },
+    {capture: true},
+  );
+
+  window.addEventListener('keydown', function(event) {
+    if (
+      shouldIgnoreEscape(event) ||
+      event.defaultPrevented ||
+      shouldIgnoreCaptureState
+    ) {
+      return;
+    }
+    const wasBlockedOnCapture = shouldIgnoreCaptureState;
+    queueMicrotask(function() {
+      if (event.defaultPrevented || wasBlockedOnCapture) {
+        return;
+      }
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({'type': 'escapeKey'}, '*');
+      }
+    });
+  });
+})();</script><script data-bard-client-injected="true">(function() {
+  function normalizeSlug(str) {
+    try {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^p{L}p{N}s_-]/gu, '')
+        .replace(/s+/g, '-');
+    } catch (e) {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9s_-]/g, '')
+        .replace(/s+/g, '-');
+    }
+  }
+
+  function findTargetElement(hash) {
+    if (!hash || hash === '#') {
+      return null;
+    }
+    const rawId = hash.startsWith('#') ? hash.slice(1) : hash;
+    let decodedId = rawId;
+    try {
+      decodedId = decodeURIComponent(rawId);
+    } catch (e) {
+      // Ignore URI malformed errors.
+    }
+
+    // 1. Direct ID match (raw and decoded).
+    let target = document.getElementById(rawId) || document.getElementById(decodedId);
+    if (target) {
+      return target;
+    }
+
+    // 2. Name attribute match (<a name="...">).
+    try {
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        target =
+          document.querySelector('[name="' + CSS.escape(rawId) + '"]') ||
+          document.querySelector('[name="' + CSS.escape(decodedId) + '"]');
+      } else {
+        const namedElements = document.getElementsByName(rawId);
+        if (namedElements && namedElements.length > 0) {
+          return namedElements[0];
+        }
+      }
+    } catch (e) {
+      // Ignore querySelector syntax errors.
+    }
+    if (target) {
+      return target;
+    }
+
+    // 3. Match heading text by slug (for Markdown TOCs where headings lack explicit IDs).
+    const targetSlug = normalizeSlug(decodedId);
+    if (targetSlug) {
+      for (const heading of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+        if (normalizeSlug(heading.textContent || '') === targetSlug) {
+          return heading;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    const anchor = target && typeof target.closest === 'function' ? target.closest('a') : null;
+    if (!anchor) {
+      return;
+    }
+
+    const href = anchor.getAttribute('href');
+    if (
+      !href ||
+      href.trim().toLowerCase().startsWith('javascript:') ||
+      anchor.hasAttribute('download')
+    ) {
+      return;
+    }
+
+    // Check if the link is an in-page hash / anchor link.
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const targetElement = findTargetElement(href);
+      if (targetElement) {
+        targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+      return;
+    }
+
+    // Check if the URL has the same origin/pathname but with a hash.
+    try {
+      const url = new URL(anchor.href, window.location.href);
+      if (
+        url.hash &&
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname
+      ) {
+        event.preventDefault();
+        const targetElement = findTargetElement(url.hash);
+        if (targetElement) {
+          targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+        return;
+      }
+    } catch (e) {
+      // Fall through if URL parsing fails.
+    }
+
+    // For all external or full navigation links, prevent iframe-level navigation
+    // (which breaks in AGSA WebView or sandboxed iframes) and ensure they open
+    // safely in a new tab/window.
+    if (anchor.target !== '_blank') {
+      event.preventDefault();
+      window.open(anchor.href, '_blank', 'noopener,noreferrer');
+    }
+  }, {capture: true});
+})();</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MD Sheikh Iqramuzzaman (Tahmid) | Civil &amp; Environmental Engineering @ IUT</title>
+  <meta name="description" content="Official personal website of MD Sheikh Iqramuzzaman (Tahmid), 3rd-year Civil and Environmental Engineering undergraduate at Islamic University of Technology (IUT, Batch 23, ID 230051101). Explore engineering apps, transport and geotechnical articles, and student chapter roles at ACI, ITE, and ICE IUT.">
+  <meta name="keywords" content="MD Sheikh Iqramuzzaman, Md Sheikh Iqramuzzaman Tahmid, Tahmid IUT, 230051101, Islamic University of Technology, Civil and Environmental Engineering, ACI IUT Student Chapter, IUT ITE Student Chapter, ICE IUT Student Chapter, Study Tracker Mini, StructBeam 2D, AutoVerse 3D">
+  <meta name="author" content="MD Sheikh Iqramuzzaman (Tahmid)">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <!-- Open Graph / LinkedIn / Facebook -->
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="MD Sheikh Iqramuzzaman (Tahmid) — Civil &amp; Environmental Engineering @ IUT">
+  <meta property="og:description" content="3rd-year CEE Undergraduate at Islamic University of Technology (IUT, Batch 23). Building engineering tools, writing transport &amp; geotechnical articles, and serving in ACI, ITE, and ICE IUT student chapters.">
+  <meta property="og:site_name" content="MD Sheikh Iqramuzzaman (Tahmid)">
+  <meta property="og:locale" content="en_US">
+  <meta property="profile:first_name" content="MD Sheikh">
+  <meta property="profile:last_name" content="Iqramuzzaman">
+  <meta property="profile:username" content="tahmid">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MD Sheikh Iqramuzzaman (Tahmid) | CEE @ IUT Portfolio">
+  <meta name="twitter:description" content="Civil &amp; Environmental Engineering Undergraduate at IUT (Batch 23). Structural analysis tools, transportation case studies, Kotlin apps, and student chapter leadership.">
+  <!-- Google Search Console Verification Placeholder (Replace content value when verifying) -->
+  <meta name="google-site-verification" content="ADD_YOUR_GOOGLE_SEARCH_CONSOLE_CODE_HERE">
+  <!-- Schema.org ProfilePage & Person JSON-LD for Google Search Rich Results -->
+  <script type="application/ld+json" id="schemaProfileJsonLd">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "dateCreated": "2026-11-17T00:00:00+06:00",
+    "dateModified": "2026-11-17T20:55:00+06:00",
+    "mainEntity": {
+      "@type": "Person",
+      "@id": "#md-sheikh-iqramuzzaman",
+      "name": "MD Sheikh Iqramuzzaman",
+      "alternateName": [
+        "Md Sheikh Iqramuzzaman Tahmid",
+        "Tahmid",
+        "MD Sheikh Iqramuzzaman (Tahmid)"
+      ],
+      "identifier": "230051101",
+      "jobTitle": "Civil and Environmental Engineering Undergraduate",
+      "description": "3rd-year Civil and Environmental Engineering undergraduate at the Islamic University of Technology (IUT, Batch 23, Section A). Senior Executive of Event Management at ACI IUT, Executive Committee Member (Archive) at IUT ITE, and Team Lead of Admin at ICE IUT Student Chapter.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Gazipur",
+        "addressRegion": "Dhaka Division",
+        "addressCountry": "BD"
+      },
+      "affiliation": [
+        {
+          "@type": "CollegeOrUniversity",
+          "name": "Islamic University of Technology (IUT)",
+          "department": "Department of Civil and Environmental Engineering"
+        },
+        {
+          "@type": "Organization",
+          "name": "American Concrete Institute (ACI) IUT Student Chapter",
+          "roleName": "Senior Executive, Event Management (2026–2027)"
+        },
+        {
+          "@type": "Organization",
+          "name": "Institute of Transportation Engineers (ITE) IUT Student Chapter",
+          "roleName": "Executive Committee Member, Archive Team (2026–2027)"
+        },
+        {
+          "@type": "Organization",
+          "name": "Institution of Civil Engineers (ICE) IUT Student Chapter",
+          "roleName": "Team Lead, Admin"
+        }
+      ],
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Islamic University of Technology (IUT)"
+      },
+      "knowsAbout": [
+        "Civil and Environmental Engineering",
+        "Reinforced Concrete Design (ACI 211.1, JSCE)",
+        "Structural Analysis (SFD, BMD, Macaulay Method, Cable Structures)",
+        "Transportation Engineering",
+        "AutoCAD",
+        "Python Engineering Computation",
+        "Kotlin Android Development",
+        "Three.js 3D Web Visualization"
+      ],
+      "knowsLanguage": ["en", "bn"]
+    }
+  }
+  </script>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef9ff',
+              100: '#d8f1ff',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              900: '#0c4a6e'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .grid-bg {
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 9999px;
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, system-ui, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:JetBrains Mono, monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.-bottom-20{bottom:-5rem}.-left-20{left:-5rem}.-right-20{right:-5rem}.-top-20{top:-5rem}.bottom-5{bottom:1.25rem}.right-5{right:1.25rem}.top-0{top:0px}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-1\.5{margin-bottom:0.375rem}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-2{height:0.5rem}.h-28{height:7rem}.h-3\.5{height:0.875rem}.h-4{height:1rem}.h-7{height:1.75rem}.h-72{height:18rem}.h-9{height:2.25rem}.h-full{height:100%}.max-h-\[85vh\]{max-height:85vh}.min-h-screen{min-height:100vh}.w-2{width:0.5rem}.w-28{width:7rem}.w-3\.5{width:0.875rem}.w-4{width:1rem}.w-7{width:1.75rem}.w-72{width:18rem}.w-9{width:2.25rem}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-6xl{max-width:72rem}.shrink-0{flex-shrink:0}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-pointer{cursor:pointer}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-8{gap:2rem}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-1\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.375rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.375rem * var(--tw-space-y-reverse))}.space-y-16 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(4rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(4rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-2\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.625rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-3\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.875rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.875rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.scroll-smooth{scroll-behavior:smooth}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-emerald-500\/20{border-color:rgb(16 185 129 / 0.2)}.border-sky-500\/20{border-color:rgb(14 165 233 / 0.2)}.border-sky-500\/30{border-color:rgb(14 165 233 / 0.3)}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-200\/60{border-color:rgb(226 232 240 / 0.6)}.border-slate-200\/70{border-color:rgb(226 232 240 / 0.7)}.border-slate-200\/80{border-color:rgb(226 232 240 / 0.8)}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-700\/50{border-color:rgb(51 65 85 / 0.5)}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-white\/10{border-color:rgb(255 255 255 / 0.1)}.border-sky-500\/40{border-color:rgb(14 165 233 / 0.4)}.bg-amber-500\/10{background-color:rgb(245 158 11 / 0.1)}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-emerald-500\/10{background-color:rgb(16 185 129 / 0.1)}.bg-indigo-500\/10{background-color:rgb(99 102 241 / 0.1)}.bg-rose-500\/10{background-color:rgb(244 63 94 / 0.1)}.bg-sky-500{--tw-bg-opacity:1;background-color:rgb(14 165 233 / var(--tw-bg-opacity, 1))}.bg-sky-500\/10{background-color:rgb(14 165 233 / 0.1)}.bg-sky-500\/20{background-color:rgb(14 165 233 / 0.2)}.bg-sky-600{--tw-bg-opacity:1;background-color:rgb(2 132 199 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-50\/80{background-color:rgb(248 250 252 / 0.8)}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/90{background-color:rgb(15 23 42 / 0.9)}.bg-slate-950\/75{background-color:rgb(2 6 23 / 0.75)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-white\/10{background-color:rgb(255 255 255 / 0.1)}.bg-white\/5{background-color:rgb(255 255 255 / 0.05)}.bg-white\/90{background-color:rgb(255 255 255 / 0.9)}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.from-sky-500{--tw-gradient-from:#0ea5e9 var(--tw-gradient-from-position);--tw-gradient-to:rgb(14 165 233 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-sky-500\/10{--tw-gradient-from:rgb(14 165 233 / 0.1) var(--tw-gradient-from-position);--tw-gradient-to:rgb(14 165 233 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-slate-900{--tw-gradient-from:#0f172a var(--tw-gradient-from-position);--tw-gradient-to:rgb(15 23 42 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-blue-600{--tw-gradient-to:rgb(37 99 235 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #2563eb var(--tw-gradient-via-position), var(--tw-gradient-to)}.via-indigo-500\/10{--tw-gradient-to:rgb(99 102 241 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), rgb(99 102 241 / 0.1) var(--tw-gradient-via-position), var(--tw-gradient-to)}.via-slate-900{--tw-gradient-to:rgb(15 23 42 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #0f172a var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-indigo-600{--tw-gradient-to:#4f46e5 var(--tw-gradient-to-position)}.to-indigo-700{--tw-gradient-to:#4338ca var(--tw-gradient-to-position)}.to-purple-500\/10{--tw-gradient-to:rgb(168 85 247 / 0.1) var(--tw-gradient-to-position)}.to-sky-950{--tw-gradient-to:#082f49 var(--tw-gradient-to-position)}.object-cover{object-fit:cover}.p-1{padding:0.25rem}.p-1\.5{padding:0.375rem}.p-2{padding:0.5rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-2\.5{padding:0.625rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-8{padding-top:2rem;padding-bottom:2rem}.pb-4{padding-bottom:1rem}.pl-4{padding-left:1rem}.pt-1{padding-top:0.25rem}.pt-2{padding-top:0.5rem}.pt-3{padding-top:0.75rem}.text-center{text-align:center}.font-mono{font-family:JetBrains Mono, monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-amber-500{--tw-text-opacity:1;color:rgb(245 158 11 / var(--tw-text-opacity, 1))}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-indigo-500{--tw-text-opacity:1;color:rgb(99 102 241 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-rose-500{--tw-text-opacity:1;color:rgb(244 63 94 / var(--tw-text-opacity, 1))}.text-rose-600{--tw-text-opacity:1;color:rgb(225 29 72 / var(--tw-text-opacity, 1))}.text-sky-300{--tw-text-opacity:1;color:rgb(125 211 252 / var(--tw-text-opacity, 1))}.text-sky-400{--tw-text-opacity:1;color:rgb(56 189 248 / var(--tw-text-opacity, 1))}.text-sky-500{--tw-text-opacity:1;color:rgb(14 165 233 / var(--tw-text-opacity, 1))}.text-sky-600{--tw-text-opacity:1;color:rgb(2 132 199 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-slate-950{--tw-text-opacity:1;color:rgb(2 6 23 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.opacity-80{opacity:0.8}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.blur-3xl{--tw-blur:blur(64px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-200{transition-duration:200ms}.hover\:border-indigo-500\/50:hover{border-color:rgb(99 102 241 / 0.5)}.hover\:border-sky-500:hover{--tw-border-opacity:1;border-color:rgb(14 165 233 / var(--tw-border-opacity, 1))}.hover\:border-sky-500\/50:hover{border-color:rgb(14 165 233 / 0.5)}.hover\:bg-sky-400:hover{--tw-bg-opacity:1;background-color:rgb(56 189 248 / var(--tw-bg-opacity, 1))}.hover\:bg-sky-500:hover{--tw-bg-opacity:1;background-color:rgb(14 165 233 / var(--tw-bg-opacity, 1))}.hover\:bg-sky-500\/10:hover{background-color:rgb(14 165 233 / 0.1)}.hover\:bg-slate-100:hover{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-200:hover{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-200\/70:hover{background-color:rgb(226 232 240 / 0.7)}.hover\:bg-white\/20:hover{background-color:rgb(255 255 255 / 0.2)}.hover\:text-slate-900:hover{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.hover\:underline:hover{-webkit-text-decoration-line:underline;text-decoration-line:underline}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-sky-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(14 165 233 / var(--tw-ring-opacity, 1))}.dark\:block:is(.dark *){display:block}.dark\:hidden:is(.dark *){display:none}.dark\:border-slate-700:is(.dark *){--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.dark\:border-slate-700\/60:is(.dark *){border-color:rgb(51 65 85 / 0.6)}.dark\:border-slate-700\/70:is(.dark *){border-color:rgb(51 65 85 / 0.7)}.dark\:border-slate-800:is(.dark *){--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.dark\:border-slate-800\/60:is(.dark *){border-color:rgb(30 41 59 / 0.6)}.dark\:border-slate-800\/80:is(.dark *){border-color:rgb(30 41 59 / 0.8)}.dark\:bg-slate-800:is(.dark *){--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-800\/60:is(.dark *){background-color:rgb(30 41 59 / 0.6)}.dark\:bg-slate-800\/90:is(.dark *){background-color:rgb(30 41 59 / 0.9)}.dark\:bg-slate-900:is(.dark *){--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-900\/90:is(.dark *){background-color:rgb(15 23 42 / 0.9)}.dark\:bg-slate-950:is(.dark *){--tw-bg-opacity:1;background-color:rgb(2 6 23 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-950\/60:is(.dark *){background-color:rgb(2 6 23 / 0.6)}.dark\:bg-white:is(.dark *){--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.dark\:bg-slate-800\/70:is(.dark *){background-color:rgb(30 41 59 / 0.7)}.dark\:text-amber-400:is(.dark *){--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.dark\:text-emerald-400:is(.dark *){--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.dark\:text-indigo-400:is(.dark *){--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.dark\:text-rose-400:is(.dark *){--tw-text-opacity:1;color:rgb(251 113 133 / var(--tw-text-opacity, 1))}.dark\:text-sky-300:is(.dark *){--tw-text-opacity:1;color:rgb(125 211 252 / var(--tw-text-opacity, 1))}.dark\:text-sky-400:is(.dark *){--tw-text-opacity:1;color:rgb(56 189 248 / var(--tw-text-opacity, 1))}.dark\:text-slate-100:is(.dark *){--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.dark\:text-slate-200:is(.dark *){--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.dark\:text-slate-300:is(.dark *){--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.dark\:text-slate-400:is(.dark *){--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.dark\:text-slate-900:is(.dark *){--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.dark\:text-white:is(.dark *){--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.dark\:hover\:bg-slate-700:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.dark\:hover\:bg-slate-800:hover:is(.dark *){--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.dark\:hover\:text-white:hover:is(.dark *){--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\:block{display:block}.sm\:inline{display:inline}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:items-end{align-items:flex-end}.sm\:p-10{padding:2.5rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:py-12{padding-top:3rem;padding-bottom:3rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-5xl{font-size:3rem;line-height:1}.sm\:text-lg{font-size:1.125rem;line-height:1.75rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}}@media (min-width: 768px){.md\:inline{display:inline}.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-end{align-items:flex-end}.md\:items-center{align-items:center}}@media (min-width: 1024px){.lg\:w-72{width:18rem}.lg\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.lg\:flex-row{flex-direction:row}.lg\:items-center{align-items:center}}</style></head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200 grid-bg">
+
+  <!-- Top Mode Switcher Bar: Live Website vs. "What People Add" Blueprint & Customizer -->
+  <div class="sticky top-0 z-50 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand / Identity -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+          SI
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-sm tracking-tight">iqramuzzaman.dev</span>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">CEE @ IUT '23</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Personal Portfolio &amp; Interactive Website Blueprint</p>
+        </div>
+      </div>
+
+      <!-- Primary View Switcher -->
+      <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+        <button id="modeLiveBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm flex items-center gap-1.5">
+          <span>🌐</span>
+          <span>My Live Website</span>
+        </button>
+        <button id="modeIdeasBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5">
+          <span>💡</span>
+          <span>What People Add (Ideas &amp; Toggles)</span>
+          <span class="px-1.5 py-0.2 bg-sky-500/20 text-sky-500 dark:text-sky-300 rounded-full text-[10px] font-mono">8</span>
+        </button>
+        <button id="modeAddBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5">
+          <span>➕</span>
+          <span class="hidden md:inline">Add Item</span>
+        </button>
+      </div>
+
+      <!-- Utility Controls -->
+      <div class="flex items-center gap-2">
+        <button id="exportHtmlBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-600 hover:bg-sky-500 text-white shadow-sm transition flex items-center gap-1.5" title="Download standalone HTML for GitHub Pages">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          <span class="hidden sm:inline">Export for GitHub Pages</span>
+        </button>
+        <button id="themeToggleBtn" type="button" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition" aria-label="Toggle theme">
+          <svg id="sunIcon" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          <svg id="moonIcon" class="w-4 h-4 block dark:hidden text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- In-Page Section Jump Bar (Visible in Live Website Mode) -->
+    <div id="liveSubNav" class="border-t border-slate-200/60 dark:border-slate-800/60 bg-slate-50/80 dark:bg-slate-950/60">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 py-1.5 flex items-center gap-2 overflow-x-auto custom-scrollbar text-xs">
+        <span class="text-slate-400 font-mono text-[11px] shrink-0">Jump to:</span>
+        <button type="button" data-scroll="sec-hero" class="nav-jump px-2.5 py-1 rounded-md hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">Overview</button>
+        <button type="button" data-scroll="sec-now" class="nav-jump px-2.5 py-1 rounded-md hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">/now Status</button>
+        <button type="button" data-scroll="sec-projects" class="nav-jump px-2.5 py-1 rounded-md hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">Projects &amp; Apps</button>
+        <button type="button" data-scroll="sec-research" class="nav-jump px-2.5 py-1 rounded-md hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">Articles &amp; Studies</button>
+        <button type="button" data-scroll="sec-leadership" class="nav-jump px-2.5 py-1 rounded-md hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">Student Chapters</button>
+        <button type="button" data-scroll="sec-beyond" class="nav-jump px-2.5 py-1 rounded-md hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">Beyond CEE</button>
+        <button type="button" data-scroll="sec-contact" class="nav-jump px-2.5 py-1 rounded-md hover:bg-slate-200/70 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">Contact</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 2: "WHAT PEOPLE ADD IN THEIR WEBSITE" — IDEA GUIDE & CUSTOMIZER -->
+  <!-- ===================================================================== -->
+  <section id="ideasView" class="hidden max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <div class="rounded-2xl bg-gradient-to-br from-sky-500/10 via-indigo-500/10 to-purple-500/10 border border-sky-500/20 p-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1.5">
+          <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-sky-600 dark:text-sky-400">
+            <span>Blueprint Guide</span>
+            <span>•</span>
+            <span>Tailored for Engineering + Tech Portfolios</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">What People Put on Their Personal Websites</h1>
+          <p class="text-sm text-slate-600 dark:text-slate-300 max-w-3xl">
+            Modern personal websites go beyond a static CV. They combine <strong>proof of work</strong> (projects, reports, code), <strong>current momentum</strong> (a <code>/now</code> section), and <strong>human personality</strong> (a <code>/uses</code> setup page and hobbies). Toggle any section below to customize your live site instantly.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="enableAllSectionsBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-sky-500 transition">
+            Enable All 8
+          </button>
+          <button id="backToLiveFromIdeasBtn" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white shadow-sm transition">
+            View My Live Site →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter by Purpose -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-2" id="ideaCategoryFilter">
+        <button type="button" data-idea-cat="all" class="idea-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white">All 8 Ideas</button>
+        <button type="button" data-idea-cat="essential" class="idea-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">Core Essentials</button>
+        <button type="button" data-idea-cat="credibility" class="idea-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">Academic &amp; Proof of Work</button>
+        <button type="button" data-idea-cat="personality" class="idea-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">Modern Trends (/now &amp; /uses)</button>
+      </div>
+      <div id="activeSectionCounter" class="text-xs font-mono text-slate-500 dark:text-slate-400">8 / 8 sections active on your site</div>
+    </div>
+
+    <!-- Dynamic Grid of 10 Website Section Ideas -->
+    <div id="ideasGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-sky-500/40 p-5 flex flex-col justify-between space-y-4 shadow-sm transition">
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">🎯</span>
+                  <h3 class="font-bold text-base">1. Hero Identity &amp; Value Pitch</h3>
+                </div>
+                
+                  <button type="button" data-toggle-sec="hero" class="sec-toggle-btn px-3 py-1 rounded-lg text-xs font-semibold transition shrink-0 bg-sky-600 text-white">
+                    ✓ Shown on Site
+                  </button>
+                
+              </div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
+                <p><strong class="text-slate-900 dark:text-white">What people add:</strong> Full name, 1-sentence positioning statement (who you are + what you do), university badge, location, and profile photo.</p>
+                <p class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60"><strong class="text-sky-600 dark:text-sky-400">How we tailored it for you:</strong> MD Sheikh Iqramuzzaman (Tahmid), 3rd-year CEE student @ IUT (Batch 23, ID 230051101), with your uploaded photo.</p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-sky-500/40 p-5 flex flex-col justify-between space-y-4 shadow-sm transition">
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">⚡</span>
+                  <h3 class="font-bold text-base">2. A "/now" Section (Current Focus)</h3>
+                </div>
+                
+                  <button type="button" data-toggle-sec="now" class="sec-toggle-btn px-3 py-1 rounded-lg text-xs font-semibold transition shrink-0 bg-sky-600 text-white">
+                    ✓ Shown on Site
+                  </button>
+                
+              </div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
+                <p><strong class="text-slate-900 dark:text-white">What people add:</strong> A snapshot of what you are studying, building, and doing right now.</p>
+                <p class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60"><strong class="text-sky-600 dark:text-sky-400">How we tailored it for you:</strong> Highlights your 3rd-year CEE studies at IUT, your 3 featured apps/tools, and your ACI, ITE, and ICE roles.</p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-sky-500/40 p-5 flex flex-col justify-between space-y-4 shadow-sm transition">
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">🛠️</span>
+                  <h3 class="font-bold text-base">3. Featured Apps, Simulators &amp; Tools</h3>
+                </div>
+                
+                  <button type="button" data-toggle-sec="projects" class="sec-toggle-btn px-3 py-1 rounded-lg text-xs font-semibold transition shrink-0 bg-sky-600 text-white">
+                    ✓ Shown on Site
+                  </button>
+                
+              </div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
+                <p><strong class="text-slate-900 dark:text-white">What people add:</strong> Focused cards showing your best software and engineering builds.</p>
+                <p class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60"><strong class="text-sky-600 dark:text-sky-400">How we tailored it for you:</strong> Showcases Study Tracker Mini (v6.0), StructBeam 2D, and AutoVerse 3D.</p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-sky-500/40 p-5 flex flex-col justify-between space-y-4 shadow-sm transition">
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">📑</span>
+                  <h3 class="font-bold text-base">4. Engineering Articles &amp; Study Write-ups</h3>
+                </div>
+                
+                  <button type="button" data-toggle-sec="research" class="sec-toggle-btn px-3 py-1 rounded-lg text-xs font-semibold transition shrink-0 bg-sky-600 text-white">
+                    ✓ Shown on Site
+                  </button>
+                
+              </div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
+                <p><strong class="text-slate-900 dark:text-white">What people add:</strong> Articles, topic write-ups, and academic presentations you have studied and written.</p>
+                <p class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60"><strong class="text-sky-600 dark:text-sky-400">How we tailored it for you:</strong> Features your articles and study write-ups on Dhaka–Gazipur BRT Line 3, Kasba–Akhaura Highway, East African Rift System, and Bangladesh Auto Industry.</p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-sky-500/40 p-5 flex flex-col justify-between space-y-4 shadow-sm transition">
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">🏛️</span>
+                  <h3 class="font-bold text-base">5. Club &amp; Student Chapter Roles</h3>
+                </div>
+                
+                  <button type="button" data-toggle-sec="leadership" class="sec-toggle-btn px-3 py-1 rounded-lg text-xs font-semibold transition shrink-0 bg-sky-600 text-white">
+                    ✓ Shown on Site
+                  </button>
+                
+              </div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
+                <p><strong class="text-slate-900 dark:text-white">What people add:</strong> Clean, simple cards listing your current student chapter positions.</p>
+                <p class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60"><strong class="text-sky-600 dark:text-sky-400">How we tailored it for you:</strong> Lists ACI IUT (Senior Executive, Event Management), IUT ITE (EC Archive), and ICE IUT (Team Lead, Admin).</p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-sky-500/40 p-5 flex flex-col justify-between space-y-4 shadow-sm transition">
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">🧤</span>
+                  <h3 class="font-bold text-base">6. Beyond Civil Engineering</h3>
+                </div>
+                
+                  <button type="button" data-toggle-sec="beyond" class="sec-toggle-btn px-3 py-1 rounded-lg text-xs font-semibold transition shrink-0 bg-sky-600 text-white">
+                    ✓ Shown on Site
+                  </button>
+                
+              </div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
+                <p><strong class="text-slate-900 dark:text-white">What people add:</strong> Personal interests, sports, and hobbies that make your site memorable.</p>
+                <p class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60"><strong class="text-sky-600 dark:text-sky-400">How we tailored it for you:</strong> Highlights being Goalkeeper for the IUT CEE football team, Liverpool FC &amp; FPL, intercity rail travel, and mystery cinema.</p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-sky-500/40 p-5 flex flex-col justify-between space-y-4 shadow-sm transition">
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">📄</span>
+                  <h3 class="font-bold text-base">7. Quick Academic CV Snapshot</h3>
+                </div>
+                
+                  <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono shrink-0">Built-In Modal</span>
+                
+              </div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
+                <p><strong class="text-slate-900 dark:text-white">What people add:</strong> A quick-view modal summarizing your education, roles, and works.</p>
+                <p class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60"><strong class="text-sky-600 dark:text-sky-400">How we tailored it for you:</strong> Built into the "View Academic CV Snapshot" button in your Hero section.</p>
+              </div>
+            </div>
+          </div>
+        
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-sky-500/40 p-5 flex flex-col justify-between space-y-4 shadow-sm transition">
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">✉️</span>
+                  <h3 class="font-bold text-base">8. Contact Hub &amp; Bio Copy</h3>
+                </div>
+                
+                  <button type="button" data-toggle-sec="contact" class="sec-toggle-btn px-3 py-1 rounded-lg text-xs font-semibold transition shrink-0 bg-sky-600 text-white">
+                    ✓ Shown on Site
+                  </button>
+                
+              </div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
+                <p><strong class="text-slate-900 dark:text-white">What people add:</strong> A clean contact form and institutional details.</p>
+                <p class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60"><strong class="text-sky-600 dark:text-sky-400">How we tailored it for you:</strong> Includes your IUT CEE department details and a 1-click LinkedIn/GitHub bio copy button.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 3: QUICK ADD ITEM BUILDER (ADD NEW PROJECT, ROLE, OR IDEA)       -->
+  <!-- ===================================================================== -->
+  <section id="addView" class="hidden max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-bold">Add Your Own Content to the Website</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Anything you add here immediately appears on your live website and stays saved in your browser.</p>
+        </div>
+        <button id="closeAddViewBtn" type="button" class="text-xs font-semibold text-sky-600 dark:text-sky-400 hover:underline">← Back to Website</button>
+      </div>
+
+      <form id="customItemForm" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5" for="itemTypeSelect">Where should this appear?</label>
+            <select id="itemTypeSelect" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <option value="project">Featured Projects &amp; Apps</option>
+              <option value="research">Transport &amp; Geotechnical Reports</option>
+              <option value="leadership">Leadership &amp; Club Experience</option>
+              <option value="now">Current Focus (/now item)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5" for="itemCategoryInput">Category / Tag</label>
+            <input id="itemCategoryInput" type="text" value="Civil &amp; Structural" required="" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g., Structural Engineering, Android App, ACI IUT">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5" for="itemTitleInput">Title / Headline</label>
+          <input id="itemTitleInput" type="text" required="" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g., RCC Beam Design Automation Script in Python">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5" for="itemDescInput">Description &amp; Impact</label>
+          <textarea id="itemDescInput" rows="3" required="" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Describe what you built, analyzed, or organized..."></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5" for="itemTechInput">Tools / Tech / Skills Used (comma-separated)</label>
+            <input id="itemTechInput" type="text" value="Python, AutoCAD, ACI 318" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g., Kotlin, Python, AutoCAD">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5" for="itemDateInput">Date / Term</label>
+            <input id="itemDateInput" type="text" value="Nov 2026" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="e.g., Nov 2026 or 2026–2027">
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-sm font-semibold shadow-sm transition">
+            Add to My Website
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 1: THE LIVE PERSONAL PORTFOLIO WEBSITE                           -->
+  <!-- ===================================================================== -->
+  <main id="liveWebsiteView" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-16">
+
+    <!-- 1. HERO & PERSONAL IDENTITY -->
+    <section id="sec-hero" data-section-id="hero" class="relative rounded-3xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-10 shadow-sm overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+        <div class="space-y-5 max-w-2xl">
+          <!-- Status Pill -->
+          <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 text-xs font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>3rd-Year B.Sc. in Civil &amp; Environmental Engineering @ IUT</span>
+            <span class="text-slate-400">•</span>
+            <span class="font-mono">Batch 23 (ID: 230051101)</span>
+          </div>
+
+          <div class="space-y-2">
+            <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+              MD Sheikh Iqramuzzaman <span class="text-sky-600 dark:text-sky-400">(Tahmid)</span>
+            </h1>
+            <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
+              3rd-year Civil &amp; Environmental Engineering student at the <strong>Islamic University of Technology (IUT)</strong>. Interested in structural mechanics, transportation planning, and building practical engineering &amp; study tools.
+            </p>
+          </div>
+
+          <!-- Key Highlights Badges -->
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium">📍 Gazipur / Dhaka, Bangladesh</span>
+            <span class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium">🏗️ Senior Executive, ACI IUT</span>
+            <span class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium">🚦 EC (Archive), IUT ITE</span>
+            <span class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium">🏛️ Team Lead (Admin), ICE IUT</span>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <button type="button" data-scroll="sec-projects" class="nav-jump px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm shadow-sm transition">
+              Explore Projects &amp; Apps
+            </button>
+            <button id="openResumeModalBtn" type="button" class="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-semibold text-sm border border-slate-200/80 dark:border-slate-700 transition flex items-center gap-2">
+              <span>📄</span>
+              <span>View Academic CV Snapshot</span>
+            </button>
+            <button type="button" id="heroIdeasTriggerBtn" class="px-4 py-2.5 rounded-xl border border-sky-500/30 text-sky-600 dark:text-sky-400 hover:bg-sky-500/10 font-semibold text-sm transition">
+              💡 See What Sections You Can Add
+            </button>
+          </div>
+        </div>
+
+        <!-- Avatar / Photo Card with Live Upload Preview -->
+        <div class="w-full lg:w-72 shrink-0 flex flex-col items-center p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 text-center space-y-3">
+          <div id="avatarPreviewContainer" class="w-28 h-28 rounded-2xl bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-700 flex flex-col items-center justify-center text-white shadow-md overflow-hidden relative group">
+            <span id="avatarInitials" class="text-3xl font-extrabold tracking-wider">MSI</span>
+            <span id="avatarSubtext" class="text-[10px] font-mono uppercase tracking-widest opacity-80 mt-0.5">Tahmid</span>
+            <img id="avatarImage" src="" alt="Profile preview" class="hidden w-full h-full object-cover">
+          </div>
+          <div>
+            <p class="font-bold text-sm">MD Sheikh Iqramuzzaman</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">CEE Undergrad • Section A • IUT</p>
+          </div>
+          <label for="photoUploadInput" class="cursor-pointer px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-medium text-sky-600 dark:text-sky-400 hover:border-sky-500 transition inline-flex items-center gap-1.5">
+            <span>📷</span>
+            <span>Preview Your Photo Here</span>
+          </label>
+          <input id="photoUploadInput" type="file" accept="image/*" class="hidden">
+
+          <div class="w-full pt-2 border-t border-slate-200/70 dark:border-slate-700/70 grid grid-cols-3 gap-2 text-center">
+            <div>
+              <div class="text-base font-extrabold text-sky-600 dark:text-sky-400" id="statProjectsCount">7</div>
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Works</div>
+            </div>
+            <div>
+              <div class="text-base font-extrabold text-indigo-600 dark:text-indigo-400">3</div>
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Chapters</div>
+            </div>
+            <div>
+              <div class="text-base font-extrabold text-emerald-600 dark:text-emerald-400">3rd</div>
+              <div class="text-[10px] text-slate-500 uppercase font-mono">Year CEE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. "/NOW" — WHAT I'M WORKING ON RIGHT NOW -->
+    <section id="sec-now" data-section-id="now" class="space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>/now — Current Focus (November 2026)</span>
+          </div>
+          <h2 class="text-2xl font-bold tracking-tight mt-1">What I'm Focused On Right Now</h2>
+        </div>
+        <span class="text-xs text-slate-500 dark:text-slate-400 font-mono">3rd-Year Undergraduate @ IUT</span>
+      </div>
+
+      <div id="nowGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-3 shadow-sm">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Academics @ IUT</span>
+              <span class="text-[11px] font-mono text-slate-400">3rd Year</span>
+            </div>
+            <h3 class="font-bold text-base">3rd-Year CEE Studies at IUT</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Studying Structural Analysis, Reinforced Concrete, Open Channel Flow, Hydrology, and Transportation Engineering in my 3rd year of Civil &amp; Environmental Engineering.</p>
+          </div>
+        </div>
+      
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-3 shadow-sm">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Apps &amp; Engineering Tools</span>
+              <span class="text-[11px] font-mono text-slate-400">Nov 2026</span>
+            </div>
+            <h3 class="font-bold text-base">Study Tracker Mini, StructBeam 2D &amp; AutoVerse 3D</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Building an offline Kotlin study timer app with home-screen widgets, a 2D beam SFD/BMD calculator, and a 4-stage 3D automotive part inspector.</p>
+          </div>
+        </div>
+      
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-3 shadow-sm">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">IUT Chapters</span>
+              <span class="text-[11px] font-mono text-slate-400">2026–2027</span>
+            </div>
+            <h3 class="font-bold text-base">ACI, ITE &amp; ICE Student Chapters</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Serving as Senior Executive (Event Management) at ACI IUT, EC Member (Archive) at IUT ITE, and Team Lead (Admin) at ICE IUT.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. FEATURED SOFTWARE, SIMULATORS & ENGINEERING TOOLS -->
+    <section id="sec-projects" data-section-id="projects" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-sky-600 dark:text-sky-400">Projects &amp; Builds</span>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">Featured Apps, Simulators &amp; Engineering Tools</h2>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Custom Android utilities, structural mechanics calculators, and 3D browser tools.</p>
+        </div>
+
+        <!-- Category Filter Buttons -->
+        <div class="flex flex-wrap gap-1.5" id="projectFilterBar">
+          <button type="button" data-proj-filter="all" class="proj-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-sky-600 text-white">All Projects</button>
+          <button type="button" data-proj-filter="Android &amp; Productivity" class="proj-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">Android Apps</button>
+          <button type="button" data-proj-filter="Civil &amp; Structural" class="proj-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">Structural Tools</button>
+          <button type="button" data-proj-filter="3D Web &amp; Simulation" class="proj-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">3D Web</button>
+        </div>
+      </div>
+
+      <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <article class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between space-y-4 hover:border-sky-500/50 transition shadow-sm">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 font-medium">Android &amp; Productivity</span>
+              <span class="text-xs font-mono text-slate-400">Nov 2026</span>
+            </div>
+            <h3 class="text-lg font-bold tracking-tight">Study Tracker Mini (v6.0 Offline Android APK)</h3>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">A 100% offline Android academic study tracker built in Kotlin and compiled via GitHub Actions CI/CD. Features per-subject stopwatch &amp; countdown timers, +/- manual time adjustment, lock-screen progress notifications, monthly bar/trend analytics, and two live Home Screen Widgets (active-first progress bars and a dynamic color-coded pie chart with legend).</p>
+          </div>
+          <div class="space-y-3 pt-2">
+            <div class="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">✦ v6.0 Released • 2 Home Screen Widgets</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Kotlin</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Android Studio</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">GitHub Actions</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">AppWidgets</span>
+            </div>
+          </div>
+        </article>
+      
+        <article class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between space-y-4 hover:border-sky-500/50 transition shadow-sm">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 font-medium">Civil &amp; Structural</span>
+              <span class="text-xs font-mono text-slate-400">Nov 2026</span>
+            </div>
+            <h3 class="text-lg font-bold tracking-tight">StructBeam 2D — Offline Structural Beam Analyzer</h3>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Interactive 2D structural beam analysis web tool engineered with default steel section properties (E = 29,000 ksi, I = 1,440 in⁴), custom multi-segment spans, point/distributed loads, internal hinges, and automated Shear Force (SFD), Bending Moment (BMD), and deflection curve generation.</p>
+          </div>
+          <div class="space-y-3 pt-2">
+            <div class="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">✦ Multi-Span &amp; Hinge Support</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Structural Mechanics</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">JavaScript</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">SFD / BMD</span>
+            </div>
+          </div>
+        </article>
+      
+        <article class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between space-y-4 hover:border-sky-500/50 transition shadow-sm">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 font-medium">3D Web &amp; Simulation</span>
+              <span class="text-xs font-mono text-slate-400">Nov 2026</span>
+            </div>
+            <h3 class="text-lg font-bold tracking-tight">AutoVerse 3D — 4-Stage Interactive Car Part Inspector</h3>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Web-based 3D automotive engineering encyclopedia structured around a 4-stage drill-down hierarchy—from global brand selection down to a granular 3D mechanical component inspector powered by Three.js.</p>
+          </div>
+          <div class="space-y-3 pt-2">
+            <div class="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">✦ 4-Stage 3D Drill-Down</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Three.js</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">3D WebGL</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Mechanical Systems</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. ENGINEERING ARTICLES & STUDY WRITE-UPS -->
+    <section id="sec-research" data-section-id="research" class="space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Articles &amp; Study Notes</span>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">Engineering Articles &amp; Study Write-ups</h2>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Topics I have studied and written articles or presentations on across transportation planning, infrastructure, and geology.</p>
+        </div>
+      </div>
+
+      <div id="researchGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <article class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-indigo-500/50 transition shadow-sm">
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">Article • KnowledgeBytes</span>
+              <span class="text-xs font-mono text-slate-400">Nov 2026</span>
+            </div>
+            <h3 class="text-base font-bold">Dhaka–Gazipur BRT Line 3 Corridor</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Studied the Bus Rapid Transit (BRT) corridor along the Dhaka–Mymensingh Highway and wrote an article discussing transport planning challenges and traffic bottlenecks.</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Transport Planning</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">BRT Line 3</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Article</span>
+          </div>
+        </article>
+      
+        <article class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-indigo-500/50 transition shadow-sm">
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">Article • Regional Transit</span>
+              <span class="text-xs font-mono text-slate-400">Nov 2026</span>
+            </div>
+            <h3 class="text-base font-bold">Kasba–Akhaura Highway Transit &amp; Road Conditions</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Studied local transit conditions and infrastructure wear along the Kasba–Akhaura Highway and wrote an article on how road breakdown affects daily commuters.</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Highway Conditions</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Commuter Transit</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Article</span>
+          </div>
+        </article>
+      
+        <article class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-indigo-500/50 transition shadow-sm">
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">Study &amp; Presentation</span>
+              <span class="text-xs font-mono text-slate-400">Apr 2026</span>
+            </div>
+            <h3 class="text-base font-bold">East African Rift System (EARS)</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Studied tectonic plate divergence, magmatic rifting, and related geological hazards across the East African Rift System for an academic presentation.</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Engineering Geology</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Tectonics</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Presentation</span>
+          </div>
+        </article>
+      
+        <article class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-indigo-500/50 transition shadow-sm">
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">Study Write-up</span>
+              <span class="text-xs font-mono text-slate-400">Nov 2026</span>
+            </div>
+            <h3 class="text-base font-bold">Automobile Industry Development in Bangladesh</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Studied and wrote a brief overview on the engineering feasibility, local assembly potential, and industrial challenges of developing an automobile sector in Bangladesh.</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Feasibility Study</span><span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">Industry Overview</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. STUDENT CHAPTER ROLES AT IUT (SIMPLE & COMPACT) -->
+    <section id="sec-leadership" data-section-id="leadership" class="space-y-4">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400">Student Chapters • IUT</span>
+        <h2 class="text-2xl font-bold tracking-tight mt-1">Club &amp; Chapter Roles</h2>
+      </div>
+
+      <div id="leadershipGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 space-y-1.5 shadow-sm">
+          <span class="text-[11px] font-mono text-slate-400">2026–2027</span>
+          <h3 class="text-sm font-bold">Senior Executive, Event Management</h3>
+          <div class="text-xs font-semibold text-sky-600 dark:text-sky-400">ACI IUT Student Chapter</div>
+          
+        </div>
+      
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 space-y-1.5 shadow-sm">
+          <span class="text-[11px] font-mono text-slate-400">2026–2027</span>
+          <h3 class="text-sm font-bold">Executive Committee Member (Archive)</h3>
+          <div class="text-xs font-semibold text-sky-600 dark:text-sky-400">IUT ITE Student Chapter</div>
+          
+        </div>
+      
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 space-y-1.5 shadow-sm">
+          <span class="text-[11px] font-mono text-slate-400">2026–2027</span>
+          <h3 class="text-sm font-bold">Team Lead, Admin</h3>
+          <div class="text-xs font-semibold text-sky-600 dark:text-sky-400">ICE IUT Student Chapter</div>
+          
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. BEYOND ENGINEERING — PERSONAL INTERESTS, SPORTS & LIFE -->
+    <section id="sec-beyond" data-section-id="beyond" class="space-y-5">
+      <div>
+        <span class="text-xs font-mono uppercase tracking-wider text-rose-600 dark:text-rose-400">Human Side • Sports, Strategy &amp; Culture</span>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">Beyond Civil Engineering</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Adding a personal section helps visitors, alumni, and recruiters connect with you as a real person.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xl">🧤</span>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-500">Football &amp; FPL</span>
+          </div>
+          <h3 class="font-bold text-base">CEE Goalkeeper &amp; Liverpool FC Fan</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            Goalkeeper for the Department of Civil &amp; Environmental Engineering football team at IUT, dedicated Liverpool FC supporter (OLSC Bangladesh), and manager of <em>Degenarate Kopites</em> in Fantasy Premier League.
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xl">🎮</span>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-500">Strategy &amp; Gaming</span>
+          </div>
+          <h3 class="font-bold text-base">Road-to-Glory Manager &amp; Esports</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            Rebuilding lower-tier clubs like Chesterfield and Blackburn Rovers in EA Sports FC &amp; eFootball, and competing in Free Fire MAX Clash Squad and Battle Royale modes.
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xl">🚆</span>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-500">Rail &amp; Mystery Cinema</span>
+          </div>
+          <h3 class="font-bold text-base">Intercity Rail Travel &amp; Detective Cinema</h3>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            Frequent intercity rail traveler across the Dhaka–Cumilla–Akhaura–Chattogram corridor, fan of plot-twist mystery/thriller cinema, and live band concerts (Sonar Bangla, Bay of Bengal).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. CONTACT & COLLABORATION HUB -->
+    <section id="sec-contact" data-section-id="contact" class="rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950 text-white p-6 sm:p-10 border border-slate-800 shadow-lg">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div class="space-y-4">
+          <span class="text-xs font-mono uppercase tracking-wider text-sky-400">Get In Touch</span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Let's Connect on Engineering, Research, or Tech</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Whether it's discussing Civil &amp; Environmental Engineering topics at IUT, student chapter activities with ACI, ITE, or ICE, or building engineering and study tools, feel free to reach out.
+          </p>
+
+          <div class="space-y-2.5 pt-2 text-xs text-slate-300">
+            <div class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">🏛️</span>
+              <span>Department of Civil &amp; Environmental Engineering, Islamic University of Technology (IUT), Board Bazar, Gazipur</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center">🪪</span>
+              <span class="font-mono">Student ID: 230051101 • Batch 23 • Section A</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2.5 pt-2">
+            <button id="copyBioBtn" type="button" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition flex items-center gap-1.5">
+              <span>📋</span>
+              <span>Copy Short Bio for LinkedIn / GitHub</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Contact Message Previewer -->
+        <form id="contactForm" class="rounded-2xl bg-white/5 border border-white/10 p-5 space-y-3.5 backdrop-blur-sm">
+          <div class="text-xs font-semibold uppercase tracking-wider text-sky-300">Send a Quick Message</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] text-slate-300 mb-1" for="visitorName">Your Name</label>
+              <input id="visitorName" type="text" required="" placeholder="e.g., Prof. / Colleague Name" class="w-full rounded-xl bg-slate-900/90 border border-slate-700 px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-300 mb-1" for="visitorTopic">Topic</label>
+              <select id="visitorTopic" class="w-full rounded-xl bg-slate-900/90 border border-slate-700 px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+                <option value="Research &amp; CEE Collaboration">Research &amp; CEE Collaboration</option>
+                <option value="ACI / ITE Student Chapter Event">ACI / ITE Student Chapter Event</option>
+                <option value="Software / Android Project">Software / Android Project</option>
+                <option value="General Inquiry">General Inquiry</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-300 mb-1" for="visitorMsg">Message</label>
+            <textarea id="visitorMsg" rows="3" required="" placeholder="Write your message for Tahmid..." class="w-full rounded-xl bg-slate-900/90 border border-slate-700 px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-sky-500"></textarea>
+          </div>
+          <button type="submit" class="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition">
+            Test Contact Submission
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: ACADEMIC CV / RESUME SNAPSHOT                                  -->
+  <!-- ===================================================================== -->
+  <div id="resumeModal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 space-y-5 shadow-2xl">
+      <div class="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-extrabold">MD Sheikh Iqramuzzaman (Tahmid)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">B.Sc. in Civil &amp; Environmental Engineering • IUT • ID: 230051101</p>
+        </div>
+        <button id="closeResumeModalBtn" type="button" class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white text-xs font-bold">✕</button>
+      </div>
+
+      <div class="space-y-4 text-xs leading-relaxed">
+        <div>
+          <div class="font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-1">Education</div>
+          <p class="font-semibold">Islamic University of Technology (IUT), OIC — Gazipur, Bangladesh</p>
+          <p class="text-slate-600 dark:text-slate-300">3rd-Year Undergraduate in Civil &amp; Environmental Engineering (Batch 23, Section A, ID: 230051101).</p>
+        </div>
+
+        <div>
+          <div class="font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-1">Student Chapter Roles (2026–2027)</div>
+          <ul class="list-disc pl-4 space-y-1 text-slate-600 dark:text-slate-300">
+            <li><strong>Senior Executive (Event Management)</strong> — ACI IUT Student Chapter</li>
+            <li><strong>Executive Committee Member (Archive)</strong> — IUT ITE Student Chapter</li>
+            <li><strong>Team Lead (Admin)</strong> — ICE IUT Student Chapter</li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-1">Projects &amp; Articles</div>
+          <ul class="list-disc pl-4 space-y-1 text-slate-600 dark:text-slate-300">
+            <li><strong>Study Tracker Mini (v6.0):</strong> Offline Android study timer &amp; analytics APK with dual Home Screen Widgets.</li>
+            <li><strong>StructBeam 2D &amp; AutoVerse 3D:</strong> 2D structural beam SFD/BMD analyzer and 4-stage 3D automotive part inspector.</li>
+            <li><strong>Articles &amp; Study Write-ups:</strong> Dhaka–Gazipur BRT Line 3 corridor article, Kasba–Akhaura Highway transit article, East African Rift System study presentation, and Bangladesh automobile industry study.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+        <button id="closeResumeBottomBtn" type="button" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBanner" class="fixed bottom-5 right-5 z-50 hidden px-4 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold shadow-xl border border-slate-700/50 flex items-center gap-2">
+    <span id="toastText">Saved!</span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // STATE MODEL & INITIAL VERIFIED USER DATA
+    // =========================================================================
+    const defaultState = {
+      activeView: 'live', // 'live' | 'ideas' | 'add'
+      ideaCategory: 'all',
+      projectFilter: 'all',
+      sectionsEnabled: {
+        hero: true,
+        now: true,
+        projects: true,
+        research: true,
+        leadership: true,
+        beyond: true,
+        contact: true
+      },
+      nowItems: [
+        {
+          id: 'now-1',
+          tag: 'Academics @ IUT',
+          title: '3rd-Year CEE Studies at IUT',
+          desc: 'Studying Structural Analysis, Reinforced Concrete, Open Channel Flow, Hydrology, and Transportation Engineering in my 3rd year of Civil & Environmental Engineering.',
+          date: '3rd Year'
+        },
+        {
+          id: 'now-2',
+          tag: 'Apps & Engineering Tools',
+          title: 'Study Tracker Mini, StructBeam 2D & AutoVerse 3D',
+          desc: 'Building an offline Kotlin study timer app with home-screen widgets, a 2D beam SFD/BMD calculator, and a 4-stage 3D automotive part inspector.',
+          date: 'Nov 2026'
+        },
+        {
+          id: 'now-3',
+          tag: 'IUT Chapters',
+          title: 'ACI, ITE & ICE Student Chapters',
+          desc: 'Serving as Senior Executive (Event Management) at ACI IUT, EC Member (Archive) at IUT ITE, and Team Lead (Admin) at ICE IUT.',
+          date: '2026–2027'
+        }
+      ],
+      projects: [
+        {
+          id: 'proj-1',
+          category: 'Android & Productivity',
+          title: 'Study Tracker Mini (v6.0 Offline Android APK)',
+          date: 'Nov 2026',
+          desc: 'A 100% offline Android academic study tracker built in Kotlin and compiled via GitHub Actions CI/CD. Features per-subject stopwatch & countdown timers, +/- manual time adjustment, lock-screen progress notifications, monthly bar/trend analytics, and two live Home Screen Widgets (active-first progress bars and a dynamic color-coded pie chart with legend).',
+          tech: ['Kotlin', 'Android Studio', 'GitHub Actions', 'AppWidgets'],
+          highlight: 'v6.0 Released • 2 Home Screen Widgets'
+        },
+        {
+          id: 'proj-2',
+          category: 'Civil & Structural',
+          title: 'StructBeam 2D — Offline Structural Beam Analyzer',
+          date: 'Nov 2026',
+          desc: 'Interactive 2D structural beam analysis web tool engineered with default steel section properties (E = 29,000 ksi, I = 1,440 in⁴), custom multi-segment spans, point/distributed loads, internal hinges, and automated Shear Force (SFD), Bending Moment (BMD), and deflection curve generation.',
+          tech: ['Structural Mechanics', 'JavaScript', 'SFD / BMD'],
+          highlight: 'Multi-Span & Hinge Support'
+        },
+        {
+          id: 'proj-3',
+          category: '3D Web & Simulation',
+          title: 'AutoVerse 3D — 4-Stage Interactive Car Part Inspector',
+          date: 'Nov 2026',
+          desc: 'Web-based 3D automotive engineering encyclopedia structured around a 4-stage drill-down hierarchy—from global brand selection down to a granular 3D mechanical component inspector powered by Three.js.',
+          tech: ['Three.js', '3D WebGL', 'Mechanical Systems'],
+          highlight: '4-Stage 3D Drill-Down'
+        }
+      ],
+      research: [
+        {
+          id: 'res-1',
+          category: 'Article • KnowledgeBytes',
+          title: 'Dhaka–Gazipur BRT Line 3 Corridor',
+          date: 'Nov 2026',
+          desc: 'Studied the Bus Rapid Transit (BRT) corridor along the Dhaka–Mymensingh Highway and wrote an article discussing transport planning challenges and traffic bottlenecks.',
+          tech: ['Transport Planning', 'BRT Line 3', 'Article']
+        },
+        {
+          id: 'res-2',
+          category: 'Article • Regional Transit',
+          title: 'Kasba–Akhaura Highway Transit & Road Conditions',
+          date: 'Nov 2026',
+          desc: 'Studied local transit conditions and infrastructure wear along the Kasba–Akhaura Highway and wrote an article on how road breakdown affects daily commuters.',
+          tech: ['Highway Conditions', 'Commuter Transit', 'Article']
+        },
+        {
+          id: 'res-3',
+          category: 'Study & Presentation',
+          title: 'East African Rift System (EARS)',
+          date: 'Apr 2026',
+          desc: 'Studied tectonic plate divergence, magmatic rifting, and related geological hazards across the East African Rift System for an academic presentation.',
+          tech: ['Engineering Geology', 'Tectonics', 'Presentation']
+        },
+        {
+          id: 'res-4',
+          category: 'Study Write-up',
+          title: 'Automobile Industry Development in Bangladesh',
+          date: 'Nov 2026',
+          desc: 'Studied and wrote a brief overview on the engineering feasibility, local assembly potential, and industrial challenges of developing an automobile sector in Bangladesh.',
+          tech: ['Feasibility Study', 'Industry Overview']
+        }
+      ],
+      leadership: [
+        {
+          id: 'lead-1',
+          role: 'Senior Executive, Event Management',
+          org: 'ACI IUT Student Chapter',
+          term: '2026–2027'
+        },
+        {
+          id: 'lead-2',
+          role: 'Executive Committee Member (Archive)',
+          org: 'IUT ITE Student Chapter',
+          term: '2026–2027'
+        },
+        {
+          id: 'lead-3',
+          role: 'Team Lead, Admin',
+          org: 'ICE IUT Student Chapter',
+          term: '2026–2027'
+        }
+      ]
+    };
+
+    const websiteSectionIdeas = [
+      {
+        id: 'hero',
+        cat: 'essential',
+        icon: '🎯',
+        title: '1. Hero Identity & Value Pitch',
+        whatPeopleAdd: 'Full name, 1-sentence positioning statement (who you are + what you do), university badge, location, and profile photo.',
+        howMappedToYou: 'MD Sheikh Iqramuzzaman (Tahmid), 3rd-year CEE student @ IUT (Batch 23, ID 230051101), with your uploaded photo.'
+      },
+      {
+        id: 'now',
+        cat: 'personality',
+        icon: '⚡',
+        title: '2. A "/now" Section (Current Focus)',
+        whatPeopleAdd: 'A snapshot of what you are studying, building, and doing right now.',
+        howMappedToYou: 'Highlights your 3rd-year CEE studies at IUT, your 3 featured apps/tools, and your ACI, ITE, and ICE roles.'
+      },
+      {
+        id: 'projects',
+        cat: 'credibility',
+        icon: '🛠️',
+        title: '3. Featured Apps, Simulators & Tools',
+        whatPeopleAdd: 'Focused cards showing your best software and engineering builds.',
+        howMappedToYou: 'Showcases Study Tracker Mini (v6.0), StructBeam 2D, and AutoVerse 3D.'
+      },
+      {
+        id: 'research',
+        cat: 'credibility',
+        icon: '📑',
+        title: '4. Engineering Articles & Study Write-ups',
+        whatPeopleAdd: 'Articles, topic write-ups, and academic presentations you have studied and written.',
+        howMappedToYou: 'Features your articles and study write-ups on Dhaka–Gazipur BRT Line 3, Kasba–Akhaura Highway, East African Rift System, and Bangladesh Auto Industry.'
+      },
+      {
+        id: 'leadership',
+        cat: 'credibility',
+        icon: '🏛️',
+        title: '5. Club & Student Chapter Roles',
+        whatPeopleAdd: 'Clean, simple cards listing your current student chapter positions.',
+        howMappedToYou: 'Lists ACI IUT (Senior Executive, Event Management), IUT ITE (EC Archive), and ICE IUT (Team Lead, Admin).'
+      },
+      {
+        id: 'beyond',
+        cat: 'personality',
+        icon: '🧤',
+        title: '6. Beyond Civil Engineering',
+        whatPeopleAdd: 'Personal interests, sports, and hobbies that make your site memorable.',
+        howMappedToYou: 'Highlights being Goalkeeper for the IUT CEE football team, Liverpool FC & FPL, intercity rail travel, and mystery cinema.'
+      },
+      {
+        id: 'resume_modal',
+        cat: 'essential',
+        icon: '📄',
+        title: '7. Quick Academic CV Snapshot',
+        whatPeopleAdd: 'A quick-view modal summarizing your education, roles, and works.',
+        howMappedToYou: 'Built into the "View Academic CV Snapshot" button in your Hero section.',
+        alwaysOn: true
+      },
+      {
+        id: 'contact',
+        cat: 'essential',
+        icon: '✉️',
+        title: '8. Contact Hub & Bio Copy',
+        whatPeopleAdd: 'A clean contact form and institutional details.',
+        howMappedToYou: 'Includes your IUT CEE department details and a 1-click LinkedIn/GitHub bio copy button.'
+      }
+    ];
+
+    // Load or initialize state safely
+    let appState = JSON.parse(JSON.stringify(defaultState));
+    try {
+      const saved = localStorage.getItem('tahmid_portfolio_state_v2');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        appState = {
+          ...defaultState,
+          ...parsed,
+          sectionsEnabled: { ...defaultState.sectionsEnabled, ...(parsed.sectionsEnabled || {}) }
+        };
+      }
+    } catch (e) {
+      // Ignore storage errors in restricted environments
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('tahmid_portfolio_state_v2', JSON.stringify(appState));
+      } catch (e) {
+        // Ignore storage errors
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastBanner');
+      const text = document.getElementById('toastText');
+      if (!toast || !text) return;
+      text.textContent = msg;
+      toast.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2800);
+    }
+
+    // =========================================================================
+    // RENDER FUNCTIONS
+    // =========================================================================
+    function renderNowSection() {
+      const container = document.getElementById('nowGrid');
+      if (!container) return;
+      container.innerHTML = appState.nowItems.map(item => `
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-3 shadow-sm">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">${escapeHtml(item.tag)}</span>
+              <span class="text-[11px] font-mono text-slate-400">${escapeHtml(item.date)}</span>
+            </div>
+            <h3 class="font-bold text-base">${escapeHtml(item.title)}</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${escapeHtml(item.desc)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderProjectsSection() {
+      const container = document.getElementById('projectsGrid');
+      if (!container) return;
+      const filtered = appState.projectFilter === 'all'
+        ? appState.projects
+        : appState.projects.filter(p => p.category === appState.projectFilter);
+
+      const statEl = document.getElementById('statProjectsCount');
+      if (statEl) {
+        statEl.textContent = String(appState.projects.length + appState.research.length);
+      }
+
+      container.innerHTML = filtered.map(proj => `
+        <article class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between space-y-4 hover:border-sky-500/50 transition shadow-sm">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 font-medium">${escapeHtml(proj.category)}</span>
+              <span class="text-xs font-mono text-slate-400">${escapeHtml(proj.date)}</span>
+            </div>
+            <h3 class="text-lg font-bold tracking-tight">${escapeHtml(proj.title)}</h3>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">${escapeHtml(proj.desc)}</p>
+          </div>
+          <div class="space-y-3 pt-2">
+            ${proj.highlight ? `<div class="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">✦ ${escapeHtml(proj.highlight)}</div>` : ''}
+            <div class="flex flex-wrap gap-1.5">
+              ${(proj.tech || []).map(t => `<span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">${escapeHtml(t)}</span>`).join('')}
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderResearchSection() {
+      const container = document.getElementById('researchGrid');
+      if (!container) return;
+      container.innerHTML = appState.research.map(item => `
+        <article class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between space-y-4 hover:border-indigo-500/50 transition shadow-sm">
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">${escapeHtml(item.category)}</span>
+              <span class="text-xs font-mono text-slate-400">${escapeHtml(item.date)}</span>
+            </div>
+            <h3 class="text-base font-bold">${escapeHtml(item.title)}</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${escapeHtml(item.desc)}</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            ${(item.tech || []).map(t => `<span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono">${escapeHtml(t)}</span>`).join('')}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderLeadershipSection() {
+      const container = document.getElementById('leadershipGrid');
+      if (!container) return;
+      container.innerHTML = appState.leadership.map(item => `
+        <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 space-y-1.5 shadow-sm">
+          <span class="text-[11px] font-mono text-slate-400">${escapeHtml(item.term)}</span>
+          <h3 class="text-sm font-bold">${escapeHtml(item.role)}</h3>
+          <div class="text-xs font-semibold text-sky-600 dark:text-sky-400">${escapeHtml(item.org)}</div>
+          ${item.desc ? `<p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pt-1">${escapeHtml(item.desc)}</p>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function renderSectionVisibility() {
+      const sections = document.querySelectorAll('[data-section-id]');
+      sections.forEach(sec => {
+        const id = sec.getAttribute('data-section-id');
+        const enabled = appState.sectionsEnabled[id] !== false;
+        sec.classList.toggle('hidden', !enabled);
+      });
+    }
+
+    function renderIdeasExplorer() {
+      const grid = document.getElementById('ideasGrid');
+      const counter = document.getElementById('activeSectionCounter');
+      if (!grid) return;
+
+      const activeCount = websiteSectionIdeas.filter(i => i.alwaysOn || appState.sectionsEnabled[i.id] !== false).length;
+      if (counter) {
+        counter.textContent = `${activeCount} / ${websiteSectionIdeas.length} sections active on your site`;
+      }
+
+      const filtered = appState.ideaCategory === 'all'
+        ? websiteSectionIdeas
+        : websiteSectionIdeas.filter(item => item.cat === appState.ideaCategory);
+
+      grid.innerHTML = filtered.map(idea => {
+        const isEnabled = idea.alwaysOn || appState.sectionsEnabled[idea.id] !== false;
+        return `
+          <div class="rounded-2xl bg-white dark:bg-slate-900 border ${isEnabled ? 'border-sky-500/40' : 'border-slate-200 dark:border-slate-800 opacity-75'} p-5 flex flex-col justify-between space-y-4 shadow-sm transition">
+            <div class="space-y-2.5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl">${idea.icon}</span>
+                  <h3 class="font-bold text-base">${escapeHtml(idea.title)}</h3>
+                </div>
+                ${idea.alwaysOn ? `
+                  <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-mono shrink-0">Built-In Modal</span>
+                ` : `
+                  <button type="button" data-toggle-sec="${idea.id}" class="sec-toggle-btn px-3 py-1 rounded-lg text-xs font-semibold transition shrink-0 ${isEnabled ? 'bg-sky-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}">
+                    ${isEnabled ? '✓ Shown on Site' : '+ Show on Site'}
+                  </button>
+                `}
+              </div>
+              <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
+                <p><strong class="text-slate-900 dark:text-white">What people add:</strong> ${escapeHtml(idea.whatPeopleAdd)}</p>
+                <p class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60"><strong class="text-sky-600 dark:text-sky-400">How we tailored it for you:</strong> ${escapeHtml(idea.howMappedToYou)}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.sec-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const secId = btn.getAttribute('data-toggle-sec');
+          if (!secId) return;
+          appState.sectionsEnabled[secId] = !(appState.sectionsEnabled[secId] !== false);
+          saveState();
+          renderSectionVisibility();
+          renderIdeasExplorer();
+          showToast(appState.sectionsEnabled[secId] ? 'Section enabled on your live website!' : 'Section hidden from your live website.');
+        });
+      });
+    }
+
+    function setActiveView(view) {
+      appState.activeView = view;
+      const liveEl = document.getElementById('liveWebsiteView');
+      const ideasEl = document.getElementById('ideasView');
+      const addEl = document.getElementById('addView');
+      const subNav = document.getElementById('liveSubNav');
+
+      const btnLive = document.getElementById('modeLiveBtn');
+      const btnIdeas = document.getElementById('modeIdeasBtn');
+      const btnAdd = document.getElementById('modeAddBtn');
+
+      liveEl.classList.toggle('hidden', view !== 'live');
+      subNav.classList.toggle('hidden', view !== 'live');
+      ideasEl.classList.toggle('hidden', view !== 'ideas');
+      addEl.classList.toggle('hidden', view !== 'add');
+
+      const activeClasses = ['bg-white', 'dark:bg-slate-900', 'text-sky-600', 'dark:text-sky-400', 'shadow-sm'];
+      const inactiveClasses = ['text-slate-600', 'dark:text-slate-300'];
+
+      [
+        [btnLive, view === 'live'],
+        [btnIdeas, view === 'ideas'],
+        [btnAdd, view === 'add']
+      ].forEach(([btn, isAct]) => {
+        if (!btn) return;
+        activeClasses.forEach(c => btn.classList.toggle(c, isAct));
+        inactiveClasses.forEach(c => btn.classList.toggle(c, !isAct));
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function copyTextFallback(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Short bio copied to clipboard!');
+        }).catch(() => fallbackExecCopy(text));
+      } else {
+        fallbackExecCopy(text);
+      }
+    }
+
+    function fallbackExecCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('Short bio copied to clipboard!');
+      } catch (err) {
+        showToast('Ready to copy!');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // =========================================================================
+    // EVENT LISTENERS & INITIALIZATION
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      renderNowSection();
+      renderProjectsSection();
+      renderResearchSection();
+      renderLeadershipSection();
+      renderSectionVisibility();
+      renderIdeasExplorer();
+
+      // View mode switcher buttons
+      document.getElementById('modeLiveBtn').addEventListener('click', () => setActiveView('live'));
+      document.getElementById('modeIdeasBtn').addEventListener('click', () => setActiveView('ideas'));
+      document.getElementById('modeAddBtn').addEventListener('click', () => setActiveView('add'));
+      document.getElementById('heroIdeasTriggerBtn').addEventListener('click', () => setActiveView('ideas'));
+      document.getElementById('backToLiveFromIdeasBtn').addEventListener('click', () => setActiveView('live'));
+      document.getElementById('closeAddViewBtn').addEventListener('click', () => setActiveView('live'));
+
+      // Enable all sections button
+      document.getElementById('enableAllSectionsBtn').addEventListener('click', () => {
+        Object.keys(appState.sectionsEnabled).forEach(k => {
+          appState.sectionsEnabled[k] = true;
+        });
+        saveState();
+        renderSectionVisibility();
+        renderIdeasExplorer();
+        showToast('All 8 portfolio sections enabled!');
+      });
+
+      // Theme toggle
+      document.getElementById('themeToggleBtn').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+      });
+
+      // Smooth scroll navigation buttons
+      document.querySelectorAll('.nav-jump').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-scroll');
+          if (appState.activeView !== 'live') {
+            setActiveView('live');
+          }
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            if (targetEl.classList.contains('hidden')) {
+              const secKey = targetEl.getAttribute('data-section-id');
+              if (secKey) {
+                appState.sectionsEnabled[secKey] = true;
+                renderSectionVisibility();
+                renderIdeasExplorer();
+              }
+            }
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      // Idea category filter buttons
+      document.querySelectorAll('.idea-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          appState.ideaCategory = btn.getAttribute('data-idea-cat') || 'all';
+          document.querySelectorAll('.idea-cat-btn').forEach(b => {
+            const active = (b.getAttribute('data-idea-cat') === appState.ideaCategory);
+            b.className = active
+              ? 'idea-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white'
+              : 'idea-cat-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300';
+          });
+          renderIdeasExplorer();
+        });
+      });
+
+      // Project category filter buttons
+      document.querySelectorAll('.proj-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          appState.projectFilter = btn.getAttribute('data-proj-filter') || 'all';
+          document.querySelectorAll('.proj-filter-btn').forEach(b => {
+            const active = (b.getAttribute('data-proj-filter') === appState.projectFilter);
+            b.className = active
+              ? 'proj-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-sky-600 text-white'
+              : 'proj-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300';
+          });
+          renderProjectsSection();
+        });
+      });
+
+      // Add New Item Form
+      document.getElementById('customItemForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const type = document.getElementById('itemTypeSelect').value;
+        const category = document.getElementById('itemCategoryInput').value.trim();
+        const title = document.getElementById('itemTitleInput').value.trim();
+        const desc = document.getElementById('itemDescInput').value.trim();
+        const techRaw = document.getElementById('itemTechInput').value.trim();
+        const date = document.getElementById('itemDateInput').value.trim() || 'Nov 2026';
+        const tech = techRaw ? techRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+        if (!title || !desc) return;
+
+        if (type === 'project') {
+          appState.projects.unshift({
+            id: 'proj-' + Date.now(),
+            category: category || 'Civil & Structural',
+            title,
+            date,
+            desc,
+            tech,
+            highlight: 'Custom Added Project'
+          });
+          appState.projectFilter = 'all';
+          renderProjectsSection();
+        } else if (type === 'research') {
+          appState.research.unshift({
+            id: 'res-' + Date.now(),
+            category: category || 'Engineering Study',
+            title,
+            date,
+            desc,
+            tech
+          });
+          renderResearchSection();
+        } else if (type === 'leadership') {
+          appState.leadership.unshift({
+            id: 'lead-' + Date.now(),
+            role: title,
+            org: category || 'IUT Student Chapter',
+            term: date,
+            desc,
+            badge: tech[0] || 'Leadership'
+          });
+          renderLeadershipSection();
+        } else if (type === 'now') {
+          appState.nowItems.unshift({
+            id: 'now-' + Date.now(),
+            tag: category || 'Current Focus',
+            title,
+            desc,
+            date
+          });
+          renderNowSection();
+        }
+
+        saveState();
+        e.target.reset();
+        setActiveView('live');
+        showToast(`Added "${title}" to your live website!`);
+      });
+
+      // Profile Photo Local Preview
+      document.getElementById('photoUploadInput').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = document.getElementById('avatarImage');
+          const initials = document.getElementById('avatarInitials');
+          const sub = document.getElementById('avatarSubtext');
+          if (img && ev.target && ev.target.result) {
+            img.src = ev.target.result;
+            img.classList.remove('hidden');
+            if (initials) initials.classList.add('hidden');
+            if (sub) sub.classList.add('hidden');
+            showToast('Profile photo updated in live preview!');
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Resume Modal Controls
+      const resumeModal = document.getElementById('resumeModal');
+      document.getElementById('openResumeModalBtn').addEventListener('click', () => {
+        resumeModal.classList.remove('hidden');
+      });
+      document.getElementById('closeResumeModalBtn').addEventListener('click', () => {
+        resumeModal.classList.add('hidden');
+      });
+      document.getElementById('closeResumeBottomBtn').addEventListener('click', () => {
+        resumeModal.classList.add('hidden');
+      });
+
+      // Copy Bio Button
+      document.getElementById('copyBioBtn').addEventListener('click', () => {
+        const bio = "MD Sheikh Iqramuzzaman (Tahmid) — 3rd-Year Civil & Environmental Engineering Undergraduate at Islamic University of Technology (IUT, Batch 23). Senior Executive (Event Management) at ACI IUT, Executive Committee Member (Archive) at IUT ITE, Team Lead (Admin) at ICE IUT, and builder of Study Tracker Mini & StructBeam 2D.";
+        copyTextFallback(bio);
+      });
+
+      // Contact Form Tester
+      document.getElementById('contactForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('visitorName').value.trim();
+        const topic = document.getElementById('visitorTopic').value;
+        showToast(`Thanks ${name}! Message on "${topic}" logged in preview.`);
+        e.target.reset();
+      });
+
+      // Export Standalone HTML Button (SEO & Static HTML Ready)
+      document.getElementById('exportHtmlBtn').addEventListener('click', () => {
+        setActiveView('live');
+        appState.projectFilter = 'all';
+        renderNowSection();
+        renderProjectsSection();
+        renderResearchSection();
+        renderLeadershipSection();
+        renderSectionVisibility();
+        const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Downloaded SEO-ready index.html for GitHub Pages!');
+      });
+    });
+  </script>
+
+</body></html>
